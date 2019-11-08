@@ -1,9 +1,14 @@
 <!-- Board.svelte -->
 <script>
 	import Item from './Item.svelte'
+	import { items } from '../stores'
 
 	export let board = null
-	export let items = []
+	$: _items = $items.filter(item => item.boardId === board.id)
+
+	const handleAddItem = () => items.add(board.id)
+	const handleRemoveItem = e => items.remove(e.detail)
+	const handleUpdateItem = e => items.update(e.detail)
 </script>
 
 {#if board}
@@ -13,11 +18,18 @@
 				<h5 class="card-title">
 					{board.title}
 				</h5>
-				<span class="count text-secondary">{items.length}</span>
+				<span class="count text-secondary">{_items.length}</span>
 			</div>
-			{#each items as item (item.id)}
-				<Item {item}/>
+			{#each _items as item (item.id)}
+				<Item
+					{item}
+					on:update={handleUpdateItem}
+					on:remove={handleRemoveItem}
+				/>
 			{/each}
+			<div class="card-action">
+				<button class="add-item" on:click={handleAddItem}>+</button>
+			</div>
 		</div>
 	</div>
 {/if}
@@ -32,6 +44,13 @@
 		display: flex;
 		justify-content: space-between;
 		align-content: center;
+	}
+
+	.add-item {
+		float: right;
+		width: 35px;
+		height: 35px;
+		padding: 0;
 	}
 
 </style>
