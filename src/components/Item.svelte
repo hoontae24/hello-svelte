@@ -1,6 +1,6 @@
 <!-- Item.svelte -->
 <script>
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, afterUpdate } from 'svelte'
 	const dispatch = createEventDispatcher()
 
 	export let item = null
@@ -9,8 +9,8 @@
 
 	const handleRemoveItem = () => dispatch('remove', item)
 	const handleUpdateItem = () => dispatch('update', item)
-	const handleToggleEditable = () => {
-		isEditable = !isEditable
+	const handleToggleEditable = (force) => {
+		isEditable = force !== undefined ? force : !isEditable
 		if (!isEditable) handleUpdateItem()
 	}
 	const handleToggleDone = () => {
@@ -21,21 +21,30 @@
 
 {#if item}
 <div
+	id={item.id}
 	class="item card p-1 mb-2 shadow-sm"
 	class:shadow={hovering}
 	on:mouseenter={() => hovering = true}
 	on:mouseleave={() => hovering = false}
 >
+	<div class="drag-handle pointer"><i class="fas fa-grip-lines"></i></div>
 	{#if isEditable}
-	<input bind:value={item.title} />
+	<input
+		bind:value={item.title} 
+		on:keypress={({key})=> key ==='Enter' && handleToggleEditable(false)}
+	/>
 	{:else}
-	<span class:item-done={item.done} on:click={handleToggleDone}>
+	<span
+		class="item-title pointer"
+		class:item-done={item.done}
+		on:click={handleToggleDone}
+	>
 		{item.title}
 	</span>
 	{/if}
 	<div class="item-action">
-		<button class="item-btn" on:click={handleToggleEditable}>E</button>
-		<button class="item-btn" on:click={handleRemoveItem}>-</button>
+		<button class="item-btn btn" on:click={() => handleToggleEditable()}><i class="far fa-edit"></i></button>
+		<button class="item-btn btn" on:click={handleRemoveItem}><i class="far fa-trash-alt"></i></button>
 	</div>
 </div>
 {/if}
@@ -44,7 +53,19 @@
 	.item {
 		transition: box-shadow .25s ease-in;
 		flex-direction: row;
-		justify-content: space-between
+		justify-content: space-between;
+		flex-wrap: nowrap;
+		align-items: center;
+	}
+
+	.item input {
+		padding: 4px;
+		height: 25px;
+		width: 160px;
+	}
+
+	.pointer {
+		cursor: pointer;
 	}
 
 	.item-done {

@@ -3,17 +3,17 @@ import { writable } from 'svelte/store'
 import uuid from 'uuid/v4'
 
 const _boards = [
-  { id: 1, title: 'Planning' },
-  { id: 2, title: 'In Progress' },
-  { id: 3, title: 'All Done' },
+  { id: uuid(), title: 'Planning' },
+  { id: uuid(), title: 'In Progress' },
+  { id: uuid(), title: 'All Done' },
 ]
 
 const _items = [
-	{ id: 1, boardId: 1, title: '자료 조사하기', done: false},
-	{ id: 2, boardId: 1, title: '교양책 읽기', done: false},
-	{ id: 3, boardId: 2, title: '분리수거하기', done: false},
-	{ id: 4, boardId: 2, title: '가계부 정리하기', done: false},
-	{ id: 5, boardId: 3, title: '버그 수정하기', done: false},
+	{ id: uuid(), boardId: _boards[0].id, title: '자료 조사하기', done: false },
+	{ id: uuid(), boardId: _boards[0].id, title: '교양책 읽기', done: false },
+	{ id: uuid(), boardId: _boards[1].id, title: '분리수거하기', done: false },
+	{ id: uuid(), boardId: _boards[1].id, title: '가계부 정리하기', done: false },
+	{ id: uuid(), boardId: _boards[2].id, title: '버그 수정하기', done: false },
 ]
 
 const createBoards = () => {
@@ -39,7 +39,7 @@ const createBoards = () => {
 
 const createItems = () => {
   const items = writable(_items)
-  const { subscribe, reset, update: _update } = items
+  const { subscribe, reset, update: _update, set } = items
 
   const add = boardId => {
     if (!boardId) return
@@ -56,7 +56,7 @@ const createItems = () => {
     _update(items => items.map(_item => (_item.id === item.id ? item : _item)))
   }
 
-  return { subscribe, reset, add, remove, update }
+  return { subscribe, reset, set, add, remove, update }
 }
 
 export const boards = createBoards()

@@ -2,7 +2,7 @@
 <script>
 	import Appbar from './components/Appbar.svelte'  
   import Board from './components/Board.svelte'
-  import { boards } from './stores'
+  import { boards, items } from './stores'
 </script>
 
 <Appbar />
